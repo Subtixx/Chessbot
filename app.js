@@ -19,9 +19,16 @@
 var restify = require('restify');
 var builder = require('botbuilder');
 var Jimp = require("jimp");
-var Chess = require('chess.js').Chess;
+var Chess = require('./chess.js').Chess;
+var ChessAI = null;
 
 var botEnabled = true;
+var botUseAI = true;
+if(botUseAI)
+{
+	ChessAI = require('./chess-ai.js');
+	ChessAI.setSearchTimeLimit(1000);
+}
 
 // TODO: Make group conversations into a group chessgame.
 
@@ -175,8 +182,8 @@ function DrawCurrentBoard(session = null, send = false)
 }
 
 function ValidateSession(session)
-{
-	if(session.userData.chess == "" || !(new Chess().validate_fen(session.userData.chess)["valid"]))
+{	
+	if(session.userData.chess == undefined || session.userData.chess == null || session.userData.chess == "" || !(new Chess().validate_fen(session.userData.chess)["valid"]))
 	{
 		session.send("No game running! Type 'new game' to start a new game!");
 		session.endDialog();
@@ -195,12 +202,18 @@ function Move(session = null, send = false, move = null)
 	var moveRes = chess.move({ from: move[0], to: move[1] }); // Move user choice!
 	if(moveRes != null)
 	{
-		// Make bot move here
-		var moves = chess.moves({ verbose: true });
-		var move = moves[Math.floor(Math.random() * moves.length)];
-		
-		session.send("I'm moving from " + move["from"] + " to " + move["to"]);
-		chess.move(move);
+		if(botUseAI)
+		{
+			var botMove = ChessAI.search(chess);
+			chess.move(botMove);
+		}else{
+			// Make bot move here
+			var moves = chess.moves({ verbose: true });
+			var move = moves[Math.floor(Math.random() * moves.length)];
+			
+			session.send("I'm moving from " + move["from"] + " to " + move["to"]);
+			chess.move(move);
+		}
 		
 		// Save fen to usersession
 		session.userData.chess = chess.fen();
