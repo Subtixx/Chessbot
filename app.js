@@ -267,7 +267,7 @@ function PiecesLoaded()
                     .subtitle("Written by Subtixx")
                     .text("Chessbot is a bot written in Javascript for Node.JS and uses the BotBuilder SDK. It was written to play chess in skype. It generates a visual layout of the chessboard using jimp")
                     .images([
-                        builder.CardImage.create(session, "http://i.imgur.com/2GuUs8N.png")
+                        builder.CardImage.create(session, "https://raw.githubusercontent.com/Subtixx/Chessbot/master/logo.png")
                     ])
                     .tap(builder.CardAction.openUrl(session, "https://github.com/Subtixx/Chessbot"))
             ]);
