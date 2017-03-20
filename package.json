@@ -1,0 +1,15 @@
+{
+  "name": "Chessbot",
+  "version": "1.0.0",
+  "description": "Chessbot is a bot written for Skype to play chess with you!",
+  "main": "app.js",
+  "scripts": {},
+  "author": "",
+  "license": "AGPL-3.0+",
+  "dependencies": {
+    "botbuilder": "^3.7.0",
+    "chess.js": "^0.10.2",
+    "jimp": "^0.2.27",
+    "restify": "^4.3.0"
+  }
+}
