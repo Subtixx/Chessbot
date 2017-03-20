@@ -69,19 +69,19 @@ var boardFont2;
 
 /*
 white = White
- - pawn -> Pawn / Bauer
- - rook -> Rook / Turm
- - knight -> Knight / Pferd
- - bishop -> Bishop / Springer
- - queen -> Queen / Dame
- - king -> King / König
+ - p -> Pawn / Bauer
+ - r -> Rook / Turm
+ - n -> Knight / Pferd
+ - b -> Bishop / Springer
+ - q -> Queen / Dame
+ - k -> King / König
 black = Black
- - pawn -> Pawn / Bauer
- - rook -> Rook / Turm
- - knight -> Knight / Pferd
- - bishop -> Bishop / Springer
- - queen -> Queen / Dame
- - king -> King / König
+ - p -> Pawn / Bauer
+ - r -> Rook / Turm
+ - n -> Knight / Pferd
+ - b -> Bishop / Springer
+ - q -> Queen / Dame
+ - k -> King / König
 */
 var pieces = [];
 
@@ -148,8 +148,8 @@ function DrawCurrentBoard(session = null, send = false)
 				image.print(boardFont, 8, 64+y*32, (8-y).toString());
 				if(board[y][x] == null) // Skip empty places
 					continue;
-				console.log("X: " + x + " Y: " + y);
-				console.log(board[y][x]);
+				//console.log("X: " + x + " Y: " + y);
+				//console.log(board[y][x]);
 					
 				if(board[y][x]["color"] == "w")
 					image.composite(pieces["white"][board[y][x]["type"]], 64+x*32, 32+y*32);
@@ -170,7 +170,7 @@ function DrawCurrentBoard(session = null, send = false)
 			}
 		});
 		
-		image.write("temp/chess.jpg");
+		//image.write("temp/chess.jpg");
 	});
 }
 
@@ -206,9 +206,24 @@ function Move(session = null, send = false, move = null)
 		session.userData.chess = chess.fen();
 		DrawCurrentBoard(session, true);
 	}else{
-		session.send("This would be an illegal move.");
-		
-		session.send(chess.moves());
+		if(chess.get(move[0])["color"] == "b")
+		{
+			session.send("This piece doesn't belong to you! (You're white. Piece is black)");
+			session.endDialog();
+			return;
+		}
+		var availableMoves = chess.moves({square: move[0]});
+		if(availableMoves != null && availableMoves != undefined && availableMoves >= 1){
+			var movesAvailable = availableMoves[0];
+			if(availableMoves.length > 1){
+				for(var i = 1; i < availableMoves.length; i++)
+					movesAvailable = movesAvailable + "," + availableMoves[i];
+			}
+			
+			session.send("This would be an illegal move. You could try to move from " + move[0] + " to one of the following: " + movesAvailable);
+		}else{
+			session.send("This would be an illegal move. This piece doesn't have any move option.");
+		}
 	}
 	
 	if(chess.game_over())
