@@ -183,7 +183,10 @@ function DrawCurrentBoard(session = null, send = false)
 
 function ValidateSession(session)
 {	
-	if(session.userData.chess == undefined || session.userData.chess == null || session.userData.chess == "" || !(new Chess().validate_fen(session.userData.chess)["valid"]))
+	if(session == undefined || session == null || 
+		session.userData == undefined || session.userData == null || 
+		session.userData.chess == undefined || session.userData.chess == null ||
+		session.userData.chess == "" || !(new Chess().validate_fen(session.userData.chess)["valid"]))
 	{
 		session.send("No game running! Type 'new game' to start a new game!");
 		session.endDialog();
@@ -204,8 +207,11 @@ function Move(session = null, send = false, move = null)
 	{
 		if(botUseAI)
 		{
+			session.sendTyping(); // Let the user know the bot is working...
 			var botMove = ChessAI.search(chess);
-			chess.move(botMove);
+			var move = chess.move(botMove);
+			
+			session.send("I'm moving from " + move["from"] + " to " + move["to"]);
 		}else{
 			// Make bot move here
 			var moves = chess.moves({ verbose: true });
@@ -277,7 +283,7 @@ function PiecesLoaded()
 				}else{
 					session.send("I don't understand sorry. (Type for example 'e2 e3' to move from e2 to e3");
 				}
-			}else{			
+			}else{
 				session.send("Hello! I'm Chessbot written by Subtixx! The following commands are available:");
 				session.send("'new game', 'move', 'status', 'from to'");
 			}
